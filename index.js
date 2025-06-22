@@ -29,99 +29,115 @@ const airportIcon = L.icon({
     iconSize: [12, 12],
     iconAnchor: [12, 12]
 });
+
+//show airports
 data["Airports"].forEach(function (data, index) {
     const marker = L.marker(L.latLng(data.lat, data.lng), { icon: airportIcon, rotationAngle: 0 });
     marker.addTo(map)
     marker.bindPopup(`${data.name} (${data.code})`)
 })
 
-// generate flights
+// data for generating planes
 const now = new Date();
 const flights = [];
 const FLIGHT_SPEED = 50;
-for (let i = 0; i < 1000; i++) {
-    var flight = {}
-    var airportData = []
-    var airports = [...data["Airports"]]
+const DAY_MS = 24 * 60 * 60 * 1000;
+const BOARDING_TIME = 10 * 60 * 1000;
+const howMuchPlanes = 500
+const today = new Date();
+const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-    var random1 = Math.floor(seededRandom(i * 100)() * airports.length);
-    airportData.push(airports[random1])
-    flight.from = L.latLng(airportData[0].lat, airportData[0].lng)
-    airports.splice(random1, 1)
+function generateTimetable(seed, airports, airliners, startTime, endTime) {
+    let timetable = [];
+    let usedAirports = [...airports];
+    let rng = seededRandom(seed);
+    let currTime = new Date(startTime);
+    let currAirportIdx = Math.floor(rng() * usedAirports.length);
+    let currAirport = usedAirports[currAirportIdx];
 
-    var random2 = Math.floor(seededRandom(i * 100)() * airports.length);
-    airportData.push(airports[random2])
-    flight.to = L.latLng(airportData[1].lat, airportData[1].lng)
+    while (currTime < endTime) {
+        let nextAirports = usedAirports.filter(a => a.code !== currAirport.code);
+        if (nextAirports.length === 0) break;
+        let nextIdx = Math.floor(rng() * nextAirports.length);
+        let nextAirport = nextAirports[nextIdx];
 
-    flight.depart = new Date(now.getTime() - Math.floor(seededRandom(i * 100)()) * 1000)
-    flight.id = `${airportData[0].code} -> ${airportData[1].code}`
+        let from = L.latLng(currAirport.lat, currAirport.lng);
+        let to = L.latLng(nextAirport.lat, nextAirport.lng);
+        let distance = getDistance(from, to);
+        let airline = airliners[Math.floor(rng() * airliners.length)];
+        let model = data.brands[Math.floor(rng() * data.brands.length)];
+        let depart = new Date(currTime);
+        let arrive = new Date(depart.getTime() + (distance / FLIGHT_SPEED) * 10);
 
-    var distance = getDistance(flight.from, flight.to);
-    flight.airline = data.airliners[Math.floor(seededRandom(i * 100)() * data.airliners.length)]
-    flight.arrive = new Date(flight.depart.getTime() + (distance / FLIGHT_SPEED) * 10);
-    flight.marker = L.marker(flight.from, { icon: planeIcon, rotationAngle: 0 });
-    flight.marker.addTo(map)
-    flight.marker.bindPopup(`<b>${flight.airline.name}</b><br>${flight.id}<br>From: ${airportData[0].name}<br>To: ${airportData[1].name}`)
+        if (arrive > endTime) break;
 
-    flights.push(flight)
+        timetable.push({
+            from, to, depart, arrive, airline, model, data: [currAirport, nextAirport]
+        });
+
+        currTime = new Date(arrive.getTime() + BOARDING_TIME);
+        currAirport = nextAirport;
+    }
+    return timetable;
 }
 
-//move the planes
+// create planes 
+for (let i = 0; i < howMuchPlanes; i++) {
+    let timetable = generateTimetable(i * 100, data["Airports"], data.airliners, startOfDay, endOfDay);
+    let firstLeg = timetable[0];
+    let marker = L.marker(firstLeg.from, { icon: planeIcon, rotationAngle: 0 });
+
+    marker.addTo(map);
+    marker.bindPopup(`<b>${firstLeg.airline.name} (${firstLeg.model.brand} ${firstLeg.model.model})</b><br>${firstLeg.data[0].code} ➤ ${firstLeg.data[1].code}<br>From: ${firstLeg.data[0].name}<br>To: ${firstLeg.data[1].name}`);
+    flights.push({ timetable, marker, currLeg: 0, arrived: false });
+}
+
+// update planes
 function updatePlanes() {
     const currentTime = new Date();
-    let allDone = true;
+    let allDone = false;
 
-    flights.forEach(flight => {
-        if (flight.boardingUntil && currentTime < flight.boardingUntil) {
-            allDone = false;
-            return;
+    for (let flight of flights) {
+        let leg = flight.timetable[flight.currLeg];
+        if (!leg) {
+            allDone = true;
+            break;
         }
 
-        if (flight.boardingUntil && currentTime >= flight.boardingUntil) {
-            let airports = [...data["Airports"]];
-            airports = airports.filter(a => a.code !== flight.to.code);
-            const randomIdx = Math.floor(Math.random() * airports.length);
-            const newAirport = airports[randomIdx];
-
-            flight.from = L.latLng(flight.to.lat, flight.to.lng);
-            flight.to = L.latLng(newAirport.lat, newAirport.lng);
-            flight.depart = new Date(currentTime);
-            flight.id = `${flight.to.code} -> ${newAirport.code}`;
-            const distance = getDistance(flight.from, flight.to);
-            flight.arrive = new Date(flight.depart.getTime() + (distance / FLIGHT_SPEED) * 10);
-            flight.marker.setLatLng(flight.from);
+        if (currentTime < leg.depart) {
+            flight.marker.setLatLng(leg.from);
             flight.marker.setRotationAngle(0);
-            flight.marker.bindPopup(`${flight.id}`);
-            delete flight.boardingUntil;
-            delete flight.arrived;
+            continue;
         }
 
-        const total = flight.arrive - flight.depart;
-        const elapsed = currentTime - flight.depart;
-        let progress = elapsed / total;
-
-        progress = Math.max(0, Math.min(1, progress));
-
-        if (progress < 1) {
-            allDone = false;
-
-            const pos = interpolatePosition(flight.from, flight.to, progress);
-            const heading = getHeading(flight.from, flight.to);
-
-            flight.marker.setLatLng(pos);
-            flight.marker.setRotationAngle(heading);
-        } else {
-            if (!flight.arrived && !flight.boardingUntil) {
-                flight.arrived = true;
-                flight.marker.setLatLng(flight.to);
-                flight.boardingUntil = new Date(currentTime.getTime() + 10 * 60 * 1000);
-            } else if (flight.boardingUntil) {
-                allDone = false;
+        if (currentTime >= leg.arrive) {
+            flight.marker.setLatLng(leg.to);
+            flight.marker.setRotationAngle(0);
+            let nextLeg = flight.timetable[flight.currLeg + 1];
+            if (nextLeg && currentTime >= nextLeg.depart) {
+                flight.currLeg++;
+                let newLeg = flight.timetable[flight.currLeg];
+                flight.marker.bindPopup(`<b>${newLeg.airline.name} (${newLeg.model.brand} ${newLeg.model.model})</b><br>${newLeg.data[0].code} ➤ ${newLeg.data[1].code}<br>From: ${newLeg.data[0].name}<br>To: ${newLeg.data[1].name}`);
+            } else if (!nextLeg) {
+                allDone = true;
+                break;
             }
+            continue;
         }
-    });
 
-    if (!allDone) {
+        let total = leg.arrive - leg.depart;
+        let elapsed = currentTime - leg.depart;
+        let progress = Math.max(0, Math.min(1, elapsed / total));
+        let pos = interpolatePosition(leg.from, leg.to, progress);
+        let heading = getHeading(leg.from, leg.to);
+        flight.marker.setLatLng(pos);
+        flight.marker.setRotationAngle(heading);
+    }
+
+    if (allDone) {
+        location.reload();
+    } else {
         requestAnimationFrame(updatePlanes);
     }
 }
@@ -144,6 +160,7 @@ let Position = L.Control.extend({
         this._latlng.innerHTML = `"lat": ` + lat + `,<br> "lng": ` + lng;
     }
 });
+
 let thisposition = new Position();
 let currCoordinates = { lat: 0, lng: 0 }
 map.addControl(thisposition);
@@ -155,6 +172,7 @@ map.addEventListener('mousemove', (event) => {
     currCoordinates.lat = lat
     currCoordinates.lng = lng
 });
+
 document.addEventListener('keydown', async (e) => {
     if (e.key == 'c') {
         navigator.clipboard.writeText(`"lat": ` + currCoordinates.lat + `,\n "lng": ` + currCoordinates.lng)

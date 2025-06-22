@@ -13,16 +13,28 @@ var data = {
             "lng": 379.80584
         },
         {
-            "name": "Sestwakumeer",
+            "name": "Sestwakummer John Fitzberg Airport",
             "code": "SWK",
             "lat": -201.06945,
             "lng": 420.30268
+        },
+        {
+            "name": "Sestwakummer John Fitzberg Airport",
+            "code": "SWK2",
+            "lat": -216.95858,
+            "lng": 408.625
         },
         {
             "name": "Tahm City Airport",
             "code": "THM",
             "lat": -179.00817,
             "lng": 218.43386
+        },
+        {
+            "name": "Chitata International Airport",
+            "code": "CHI",
+            "lat": -166.00915,
+            "lng": 235.875
         },
         {
             "name": "East Glorreiche",
@@ -35,6 +47,12 @@ var data = {
             "code": "SAI",
             "lat": -203.57853,
             "lng": 94.69136
+        },
+        {
+            "name": "Kampong Apong Airport",
+            "code": "KAM",
+            "lat": -236.28118,
+            "lng": 80
         },
         {
             "name": "Ferdinand Airport",
@@ -73,16 +91,46 @@ var data = {
             "lng": 129.18392
         },
         {
-            "name": "Farrous",
+            "name": "Farrous International Airport",
             "code": "FRS",
             "lat": -224.68086,
             "lng": 129.62134
+        },
+        {
+            "name": "Abu Saif Pilgrims Airport",
+            "code": "ABU",
+            "lat": -226.95624,
+            "lng": 127.625
+        },
+        {
+            "name": "Sa'di City Airport",
+            "code": "SAD",
+            "lat": -239.63815,
+            "lng": 130.5625
         },
         {
             "name": "Tuhn",
             "code": "THN",
             "lat": -323.46017,
             "lng": 504.1759
+        },
+        {
+            "name": "Kashibu Airport",
+            "code": "IBU",
+            "lat": -246.0785,
+            "lng": 149.25
+        },
+        {
+            "name": "Bandar Ishaq International Airport",
+            "code": "ISH",
+            "lat": -242.88547,
+            "lng": 120.4375
+        },
+        {
+            "name": "Lail City Airport",
+            "code": "LAI",
+            "lat": -249.77342,
+            "lng": 136.5625
         },
         {
             "name": "Rashak International Airport",
@@ -127,6 +175,12 @@ var data = {
             "lng": 153.6875
         },
         {
+            "name": "Kamana International Airport",
+            "code": "ANA",
+            "lat": -239.21349,
+            "lng": 163.4375
+        },
+        {
             "name": "Arkarta Airport",
             "code": "AKT",
             "lat": -291.00952,
@@ -158,7 +212,7 @@ var data = {
         },
         {
             "name": "Ortakent City International Airport",
-            "code": "BKL",
+            "code": "OKA",
             "lat": -203.77481,
             "lng": 299.25
         },
@@ -179,11 +233,72 @@ var data = {
             "code": "CIT",
             "lat": -229.94272,
             "lng": 364.375
+        },
+        {
+            "name": "Suton Airport",
+            "code": "SUT",
+            "lat": -97.25641,
+            "lng": 88.875
+        },
+        {
+            "name": "Newcraft International Airport",
+            "code": "CRA",
+            "lat": -102.885,
+            "lng": 70.375
+        },
+        {
+            "name": "Graham Airport",
+            "code": "GRA",
+            "lat": -92.32202,
+            "lng": 73.1875
+        },
+        {
+            "name": "Siento Wilson Airport",
+            "code": "WIL",
+            "lat": -91.00749,
+            "lng": 88.0625
+        },
+        {
+            "name": "Pablostok Airport",
+            "code": "LOP",
+            "lat": -79.871,
+            "lng": 79
+        },
+        {
+            "name": "Priminskaya Republic Airport",
+            "code": "PRM",
+            "lat": -169.13774,
+            "lng": 586.875
+        },
+        {
+            "name": "Stillake City International Airport",
+            "code": "STL",
+            "lat": -173.76525,
+            "lng": 589
         }
     ],
-    "brands": {
-
-    },
+    "brands": [
+        {
+            "brand": "Hefdig",
+            "model": "200K",
+            "origin": "Maritimia"
+        },
+        {
+            "brand": "Hefdig",
+            "model": "300K",
+            "origin": "Maritimia"
+        },
+        {
+            "brand": "SUICA Aerospace",
+            "model": "120",
+            "origin": "Asatland"
+        },
+        {
+            "brand": "NUXCORP",
+            "model": "B700",
+            "origin": "Asatland"
+        }
+    ], 
     "airliners": [
         {
             "name": "Archipelago",
@@ -224,6 +339,11 @@ var data = {
             "name": "Emirati Airways",
             "origin": "Farrous",
             "logo": "emirati-farrous.png"
+        },
+        {
+            "name": "Leoneurian Air",
+            "origin": "Leoneury",
+            "logo": "leoneuryair-leoneury.png"
         }
     ]
 }
