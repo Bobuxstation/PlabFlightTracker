@@ -12,7 +12,7 @@
     padding: 10px;
     position: absolute;
     z-index: 999;
-    height: 100vh;
+    height: 100dvh;
     pointer-events: none;
 }
 
