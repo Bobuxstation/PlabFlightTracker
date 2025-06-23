@@ -61,6 +61,8 @@ function generateTimetable(seed, airports, airliners, startTime, endTime) {
     let currTime = new Date(startTime);
     let currAirportIdx = Math.floor(rng() * usedAirports.length);
     let currAirport = usedAirports[currAirportIdx];
+    let airline = airliners[Math.floor(rng() * airliners.length)];
+    let model = data.brands[Math.floor(rng() * data.brands.length)];
 
     while (currTime < endTime) {
         let nextAirports = usedAirports.filter(a => a.code !== currAirport.code);
@@ -71,8 +73,6 @@ function generateTimetable(seed, airports, airliners, startTime, endTime) {
         let from = L.latLng(currAirport.lat, currAirport.lng);
         let to = L.latLng(nextAirport.lat, nextAirport.lng);
         let distance = getDistance(from, to);
-        let airline = airliners[Math.floor(rng() * airliners.length)];
-        let model = data.brands[Math.floor(rng() * data.brands.length)];
         let depart = new Date(currTime);
         let arrive = new Date(depart.getTime() + (distance / FLIGHT_SPEED) * 10);
 
