@@ -275,6 +275,102 @@ var data = {
             "code": "STL",
             "lat": -173.76525,
             "lng": 589
+        },
+        {
+            "name": "Qrod Juan International Airport",
+            "code": "QRJ",
+            "lat": -316.58971,
+            "lng": 228
+        },
+        {
+            "name": "20 November Airport",
+            "code": "TON",
+            "lat": -291.39391,
+            "lng": 346.75
+        },
+        {
+            "name": "Brookfield Arctic Airport",
+            "code": "BRK",
+            "lat": -69.99519,
+            "lng": 303.625
+        },
+        {
+            "name": "Fire Island Airport",
+            "code": "IAF",
+            "lat": -299.94485,
+            "lng": 476.8125
+        },
+        {
+            "name": "Don Son Airport",
+            "code": "DNS",
+            "lat": -275.14191,
+            "lng": 561.1875
+        },
+        {
+            "name": "Chima Hinide International Airport",
+            "code": "CIM",
+            "lat": -305.83331,
+            "lng": 566.3125
+        },
+        {
+            "name": "Kibrithall Koha Airport",
+            "code": "KIB",
+            "lat": -177.26207,
+            "lng": 347.4375
+        },
+        {
+            "name": "Agustan Airport",
+            "code": "AGU",
+            "lat": -154.76105,
+            "lng": 362.625
+        },
+        {
+            "name": "Serantian Airport",
+            "code": "SER",
+            "lat": -183.20085,
+            "lng": 323
+        },
+        {
+            "name": "Cotonica Cottbus International Airport",
+            "code": "COT",
+            "lat": -168.75956,
+            "lng": 248.375
+        },
+        {
+            "name": "Saulencitta Airport",
+            "code": "SAU",
+            "lat": -212.53775,
+            "lng": 363
+        },
+        {
+            "name": "Mangionia Tahm Airport",
+            "code": "MNG",
+            "lat": -189.52528,
+            "lng": 372.5
+        },
+        {
+            "name": "Magnolia Blooms Airport",
+            "code": "MAG",
+            "lat": -304.02904,
+            "lng": 135.5625
+        },
+        {
+            "name": "Southkugae International Airport",
+            "code": "KUG",
+            "lat": -209.89581,
+            "lng": 405
+        },
+        {
+            "name": "New Glorreiche International Airport",
+            "code": "NGL",
+            "lat": -222.956,
+            "lng": 372.4375
+        },
+        {
+            "name": "Hafenbavri Airport",
+            "code": "HBV",
+            "lat": -229.69231,
+            "lng": 389.8125
         }
     ],
     "brands": [
@@ -298,7 +394,7 @@ var data = {
             "model": "B700",
             "origin": "Asatland"
         }
-    ], 
+    ],
     "airliners": [
         {
             "name": "Archipelago",

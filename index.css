@@ -9,7 +9,7 @@
     -webkit-box-shadow: 0px 30px 50px 0px rgba(0, 0, 0, 0.5) inset;
     -moz-box-shadow: 0px 30px 50px 0px rgba(0, 0, 0, 0.5) inset;
     width: 100vw;
-    padding: 10px;
+    padding: 25px;
     position: absolute;
     z-index: 999;
     height: 100dvh;
@@ -20,4 +20,32 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: transportFont, Arial, Helvetica, sans-serif;
+}
+
+h1, h5 {
+    display: inline-block;
+}
+
+input {
+    float: right;
+    padding: 10px;
+    pointer-events: all;
+    width: 25vw;
+    border: gray solid 1px;
+    border-radius: 10px;
+}
+
+b {
+    font-family: transportBold, Arial, Helvetica, sans-serif;
+}
+
+@font-face {
+    font-family: transportFont;
+    src: url("Transport-Semibold.ttf");
+}
+
+@font-face {
+    font-family: transportBold;
+    src: url("Transport-Black.ttf");
 }

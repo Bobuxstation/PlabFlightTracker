@@ -48,6 +48,12 @@ const today = new Date();
 const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
 const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
+function generateFlightCode(airline, model, from, to, rng) {
+    const airlineCode = airline.code || airline.name.substring(0, 2).toUpperCase();
+    const num = Math.floor(rng() * 9000) + 1000;
+    return `${airlineCode}${num}`;
+}
+
 function generateTimetable(seed, airports, airliners, startTime, endTime) {
     let timetable = [];
     let usedAirports = [...airports];
@@ -72,8 +78,9 @@ function generateTimetable(seed, airports, airliners, startTime, endTime) {
 
         if (arrive > endTime) break;
 
+        let flightCode = generateFlightCode(airline, model, currAirport, nextAirport, rng);
         timetable.push({
-            from, to, depart, arrive, airline, model, data: [currAirport, nextAirport]
+            from, to, depart, arrive, airline, model, flightCode, data: [currAirport, nextAirport]
         });
 
         currTime = new Date(arrive.getTime() + BOARDING_TIME);
@@ -89,7 +96,12 @@ for (let i = 0; i < howMuchPlanes; i++) {
     let marker = L.marker(firstLeg.from, { icon: planeIcon, rotationAngle: 0 });
 
     marker.addTo(map);
-    marker.bindPopup(`<b>${firstLeg.airline.name} (${firstLeg.model.brand} ${firstLeg.model.model})</b><br>${firstLeg.data[0].code} ➤ ${firstLeg.data[1].code}<br>From: ${firstLeg.data[0].name}<br>To: ${firstLeg.data[1].name}`);
+    marker.bindPopup(
+        `<b>${firstLeg.airline.name} ${firstLeg.flightCode}</b><br>` +
+        `${firstLeg.data[0].code} ➤ ${firstLeg.data[1].code}<br>` +
+        `From: ${firstLeg.data[0].name}<br>To: ${firstLeg.data[1].name}<br>` +
+        `Aircraft Model: ${firstLeg.model.brand} ${firstLeg.model.model}`
+    );
     flights.push({ timetable, marker, currLeg: 0, arrived: false });
 }
 
@@ -118,7 +130,12 @@ function updatePlanes() {
             if (nextLeg && currentTime >= nextLeg.depart) {
                 flight.currLeg++;
                 let newLeg = flight.timetable[flight.currLeg];
-                flight.marker.bindPopup(`<b>${newLeg.airline.name} (${newLeg.model.brand} ${newLeg.model.model})</b><br>${newLeg.data[0].code} ➤ ${newLeg.data[1].code}<br>From: ${newLeg.data[0].name}<br>To: ${newLeg.data[1].name}`);
+                flight.marker.bindPopup(
+                    `<b>${newLeg.airline.name} ${newLeg.flightCode}</b><br>` +
+                    `${newLeg.data[0].code} ➤ ${newLeg.data[1].code}<br>` +
+                    `From: ${newLeg.data[0].name}<br>To: ${newLeg.data[1].name}<br>` +
+                    `Aircraft Model: ${newLeg.model.brand} ${newLeg.model.model}`
+                );
             } else if (!nextLeg) {
                 allDone = true;
                 break;
@@ -144,31 +161,10 @@ function updatePlanes() {
 updatePlanes();
 
 // show coordinates
-let Position = L.Control.extend({
-    _container: null,
-    options: {
-        position: 'bottomleft'
-    },
-
-    onAdd: function (map) {
-        var latlng = L.DomUtil.create('div', 'mouseposition');
-        this._latlng = latlng;
-        return latlng;
-    },
-
-    updateHTML: function (lat, lng) {
-        this._latlng.innerHTML = `"lat": ` + lat + `,<br> "lng": ` + lng;
-    }
-});
-
-let thisposition = new Position();
 let currCoordinates = { lat: 0, lng: 0 }
-map.addControl(thisposition);
 map.addEventListener('mousemove', (event) => {
     let lat = Math.round(event.latlng.lat * 100000) / 100000;
     let lng = Math.round(event.latlng.lng * 100000) / 100000;
-    thisposition.updateHTML(lat, lng);
-
     currCoordinates.lat = lat
     currCoordinates.lng = lng
 });
@@ -176,5 +172,23 @@ map.addEventListener('mousemove', (event) => {
 document.addEventListener('keydown', async (e) => {
     if (e.key == 'c') {
         navigator.clipboard.writeText(`"lat": ` + currCoordinates.lat + `,\n "lng": ` + currCoordinates.lng)
+    }
+});
+
+document.getElementById("searcher").addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const elem = document.getElementById("searcher")
+        const value = elem.value.trim();
+        if (value) {
+            const flight = flights.find(f => f.timetable.some(leg => leg.flightCode.toLowerCase() === value.toLowerCase()));
+            if (flight) {
+                map.setView(flight.marker.getLatLng(), map.getZoom());
+                flight.marker.openPopup();
+                elem.value = '';
+            } else {
+                alert("Could not find flight!")
+                elem.value = '';
+            }
+        }
     }
 });
